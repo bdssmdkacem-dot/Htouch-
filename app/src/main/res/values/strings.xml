@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">DTOUCH</string>
+    <string name="a11y_desc">تتيح لـ DTOUCH تحريك مؤشر على الشاشة وتنفيذ النقر والتمرير والرجوع والرئيسية بناءً على إيماءات يدك أمام الكاميرا.</string>
+</resources>
