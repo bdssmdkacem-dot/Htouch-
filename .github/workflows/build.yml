@@ -21,9 +21,20 @@ jobs:
       - uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: "8.7"
-      - name: Build debug APK
-        run: gradle assembleDebug --no-daemon --stacktrace
+      - name: Create temporary release signing key
+        run: |
+          keytool -genkeypair -v \
+            -keystore ci-release.jks \
+            -storepass dtouch-test-store \
+            -keypass dtouch-test-key \
+            -alias dtouch \
+            -keyalg RSA -keysize 2048 -validity 3650 \
+            -dname "CN=DTOUCH Test, OU=Development, O=DTOUCH, L=Agadir, ST=Souss-Massa, C=MA"
+      - name: Build signed release APK
+        run: gradle assembleRelease --no-daemon --stacktrace
+      - name: Rename release APK
+        run: cp app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/DTOUCH-release.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: DTOUCH-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: DTOUCH-release-apk
+          path: app/build/outputs/apk/release/DTOUCH-release.apk
