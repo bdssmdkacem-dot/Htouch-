@@ -25,6 +25,7 @@ jobs:
         run: |
           keytool -genkeypair -v \
             -keystore ci-release.jks \
+            -storetype JKS \
             -storepass dtouch-test-store \
             -keypass dtouch-test-key \
             -alias dtouch \
