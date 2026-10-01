@@ -10,6 +10,7 @@ import com.google.mediapipe.tasks.vision.core.ImageProcessingOptions
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarker
 import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarkerResult
+import kotlin.math.roundToInt
 
 data class HandState(val gesture: Gesture, val x: Float, val y: Float)
 
@@ -19,10 +20,9 @@ class HandTracker(context: Context, private val onState: (HandState?) -> Unit) :
     private var candidate = Gesture.NONE
     private var candidateCount = 0
     private var confirmed = Gesture.NONE
-    private val confirmFrames = 3
     private var sx = 0.5f
     private var sy = 0.5f
-    private val alpha = 0.35f
+
     init {
         val options = HandLandmarker.HandLandmarkerOptions.builder()
             .setBaseOptions(BaseOptions.builder().setModelAssetPath("hand_landmarker.task").build())
@@ -34,9 +34,12 @@ class HandTracker(context: Context, private val onState: (HandState?) -> Unit) :
             .build()
         landmarker = HandLandmarker.createFromOptions(context, options)
     }
+
     override fun analyze(image: ImageProxy) {
         val now = SystemClock.uptimeMillis()
-        if (now - lastTs < 66) { image.close(); return }
+        var interval = (1000f / Prefs.get(Prefs.FPS)).toLong()
+        if (EngineState.paused) interval = maxOf(interval, 200L)
+        if (now - lastTs < interval) { image.close(); return }
         lastTs = now
         try {
             val rotation = image.imageInfo.rotationDegrees
@@ -46,20 +49,28 @@ class HandTracker(context: Context, private val onState: (HandState?) -> Unit) :
         } catch (e: Exception) {
         } finally { image.close() }
     }
+
     private fun handle(result: HandLandmarkerResult) {
         val hand = result.landmarks().firstOrNull()
         if (hand == null) {
             candidate = Gesture.NONE; candidateCount = 0; confirmed = Gesture.NONE
+            EngineState.handVisible = false
+            EngineState.gesture = Gesture.NONE
             onState(null); return
         }
-        val raw = GestureClassifier.classify(hand)
+        val frames = if (EngineState.paused) 2 else Prefs.get(Prefs.CONFIRM).roundToInt()
+        val raw = GestureClassifier.classify(hand, Prefs.get(Prefs.PINCH))
         if (raw == candidate) candidateCount++ else { candidate = raw; candidateCount = 1 }
-        if (candidateCount >= confirmFrames) confirmed = candidate
+        if (candidateCount >= frames) confirmed = candidate
+        val alpha = Prefs.get(Prefs.SMOOTHING)
         val tip = hand[8]
         val mx = 1f - tip.x()
         sx += alpha * (mx - sx)
         sy += alpha * (tip.y() - sy)
+        EngineState.handVisible = true
+        EngineState.gesture = confirmed
         onState(HandState(confirmed, sx, sy))
     }
+
     fun close() { try { landmarker.close() } catch (e: Exception) { } }
 }
