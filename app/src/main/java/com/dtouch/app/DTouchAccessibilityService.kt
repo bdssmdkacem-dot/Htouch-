@@ -26,7 +26,7 @@ class CursorView(ctx: Context) : View(ctx) {
     private val fill=Paint(Paint.ANTI_ALIAS_FLAG).apply{style=Paint.Style.FILL}
     private val ring=Paint(Paint.ANTI_ALIAS_FLAG).apply{style=Paint.Style.STROKE;strokeWidth=5f;color=Color.WHITE}
     private val loc=IntArray(2)
-    override fun onDraw(c:Canvas){if(!shown)return;getLocationOnScreen(loc);val x=cx-loc[0];val y=cy-loc[1];fill.color=Color.parseColor(if(pinching)"#AAFF3B30"else"#AA22D3EE");c.drawCircle(x,y,if(pinching)radius*.65f else radius,fill);c.drawCircle(x,y,radius,ring)}
+    override fun onDraw(c:Canvas){if(!shown)return;getLocationOnScreen(loc);val x=cx-loc[0];val y=cy-loc[1];fill.color=Color.parseColor(if (pinching) "#AAFF3B30" else "#AA22D3EE");c.drawCircle(x,y,if (pinching) radius * .65f else radius,fill);c.drawCircle(x,y,radius,ring)}
 }
 
 class DTouchAccessibilityService:AccessibilityService(){
