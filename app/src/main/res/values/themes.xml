@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.DTouch" parent="android:theme.DeviceDefault.NoActionBar">
+    <style name="Theme.DTouch" parent="android:Theme.DeviceDefault.NoActionBar">
         <item name="android:windowBackground">@color/ic_bg</item>
         <item name="android:statusBarColor">@color/ic_bg</item>
         <item name="android:navigationBarColor">@color/ic_bg</item>
