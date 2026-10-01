@@ -16,7 +16,7 @@ android {
     }
     signingConfigs {
         create("ciRelease") {
-            storeFile = file(System.getenv("DTOUCH_KEYSTORE") ?: "ci-release.jks")
+            storeFile = file(System.getenv("DTOUCH_KEYSTORE") ?: "${rootProject.projectDir}/ci-release.jks")
             storePassword = System.getenv("DTOUCH_STORE_PASSWORD") ?: "dtouch-test-store"
             keyAlias = System.getenv("DTOUCH_KEY_ALIAS") ?: "dtouch"
             keyPassword = System.getenv("DTOUCH_KEY_PASSWORD") ?: "dtouch-test-key"
