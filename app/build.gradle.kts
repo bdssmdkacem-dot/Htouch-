@@ -14,20 +14,28 @@ android {
         versionName = "1.0"
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
     }
+
     signingConfigs {
-        create("ciRelease") {
-            storeFile = file(System.getenv("DTOUCH_KEYSTORE") ?: "${rootProject.projectDir}/ci-release.jks")
-            storePassword = System.getenv("DTOUCH_STORE_PASSWORD") ?: "dtouch-test-store"
-            keyAlias = System.getenv("DTOUCH_KEY_ALIAS") ?: "dtouch"
-            keyPassword = System.getenv("DTOUCH_KEY_PASSWORD") ?: "dtouch-test-key"
+        create("release") {
+            val keystorePath = System.getenv("DTOUCH_KEYSTORE_PATH")
+                ?: throw GradleException("DTOUCH_KEYSTORE_PATH is required for release builds")
+            storeFile = file(keystorePath)
+            storePassword = System.getenv("DTOUCH_STORE_PASSWORD")
+                ?: throw GradleException("DTOUCH_STORE_PASSWORD is required")
+            keyAlias = System.getenv("DTOUCH_KEY_ALIAS")
+                ?: throw GradleException("DTOUCH_KEY_ALIAS is required")
+            keyPassword = System.getenv("DTOUCH_KEY_PASSWORD")
+                ?: throw GradleException("DTOUCH_KEY_PASSWORD is required")
         }
     }
+
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("ciRelease")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -35,6 +43,7 @@ android {
     kotlinOptions { jvmTarget = "17" }
     androidResources { noCompress += listOf("task", "tflite") }
 }
+
 dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.activity:activity-ktx:1.9.0")
