@@ -47,5 +47,5 @@ class MainActivity : ComponentActivity() {
     override fun onResume(){super.onResume();updateStatus()}
     private fun addBtn(parent:LinearLayout,label:String,onClick:()->Unit){val b=Button(this).apply{text=label;setOnClickListener{onClick()}};parent.addView(b,LinearLayout.LayoutParams(-1,-2).apply{topMargin=dp(8)})}
     private fun startEngine(){if(DTouchAccessibilityService.instance==null){Toast.makeText(this,"فعّل خدمة إمكانية الوصول أولاً",Toast.LENGTH_LONG).show();return};ContextCompat.startForegroundService(this,Intent(this,CameraService::class.java));status.postDelayed({updateStatus()},800)}
-    private fun updateStatus(){val a11y=DTouchAccessibilityService.instance!=null;val cam=CameraService.running;status.text=(if(a11y)"✅ خدمة الوصول: مفعّلة"else"❌ خدمة الوصول: غير مفعّلة")+"\n"+(if(!cam)"⏸️ الكاميرا: متوقفة"else if(EngineState.paused)"⏸️ الكاميرا: تعمل (متوقف مؤقتًا)"else"✅ الكاميرا: تعمل")}
+    private fun updateStatus(){val a11y=DTouchAccessibilityService.instance!=null;val cam=CameraService.running;status.text=(if (a11y) "✅ خدمة الوصول: مفعّلة" else "❌ خدمة الوصول: غير مفعّلة")+"\n"+(if (!cam) "⏸️ الكاميرا: متوقفة" else if (EngineState.paused) "⏸️ الكاميرا: تعمل (متوقف مؤقتًا)" else "✅ الكاميرا: تعمل")}
 }
