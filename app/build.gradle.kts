@@ -14,7 +14,20 @@ android {
         versionName = "1.0"
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
     }
-    buildTypes { release { isMinifyEnabled = false } }
+    signingConfigs {
+        create("ciRelease") {
+            storeFile = file(System.getenv("DTOUCH_KEYSTORE") ?: "ci-release.jks")
+            storePassword = System.getenv("DTOUCH_STORE_PASSWORD") ?: "dtouch-test-store"
+            keyAlias = System.getenv("DTOUCH_KEY_ALIAS") ?: "dtouch"
+            keyPassword = System.getenv("DTOUCH_KEY_PASSWORD") ?: "dtouch-test-key"
+        }
+    }
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("ciRelease")
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
